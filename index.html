@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>FocusEye AI Smart Classroom</title>
+  <link rel="stylesheet" href="style.css" />
+  <!-- FACE API -->
+  <script defer src="https://cdn.jsdelivr.net/npm/face-api.js"></script>
+  <script defer src="script.js"></script>
+</head>
+
+<body>
+
+  <!-- LOGIN PAGE -->
+  <div id="loginPage" class="login-container">
+    <div class="login-box">
+      <h1>🎯 FocusEye AI</h1>
+      <input type="text" id="username" placeholder="Username">
+      <input type="password" id="password" placeholder="Password">
+      <button onclick="login()">Login</button>
+      <button onclick="showCreate()">Create Account</button>
+    </div>
+  </div>
+
+  <!-- CREATE ACCOUNT -->
+  <div id="createPage" class="login-container hidden">
+    <div class="login-box">
+      <h1>Create Account</h1>
+      <input type="text" id="newUser" placeholder="New Username">
+      <input type="password" id="newPass" placeholder="New Password">
+      <button onclick="createAccount()">Create</button>
+      <button onclick="backLogin()">Back</button>
+    </div>
+  </div>
+
+  <!-- DASHBOARD -->
+  <div id="dashboard" class="hidden">
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+      <h2>🎯 FocusEye</h2>
+      <!-- FIX: Added id to each li for active highlighting -->
+      <ul>
+        <li id="nav-home"     class="nav-item active" onclick="showSection('homeSection', this)">🏠 Dashboard</li>
+        <li id="nav-camera"   class="nav-item"        onclick="showSection('cameraSection', this)">📷 Live Camera</li>
+        <li id="nav-students" class="nav-item"        onclick="showSection('studentsSection', this)">👨‍🎓 Students</li>
+        <li id="nav-analysis" class="nav-item"        onclick="showSection('analysisSection', this)">📊 Quick Analysis</li>
+      </ul>
+    </aside>
+
+    <!-- MAIN -->
+    <main class="main-content">
+
+      <header>
+        <div class="logo">👁 AI Smart Classroom</div>
+        <button class="logout-btn" onclick="logout()">Logout</button>
+      </header>
+
+      <!-- HOME SECTION -->
+      <section id="homeSection">
+        <div class="analytics">
+          <div class="card">
+            <h2>Total Students</h2>
+            <!-- FIX: Shows fixed student count set by teacher, not random -->
+            <p id="students">0</p>
+          </div>
+          <div class="card">
+            <h2>Average Attention</h2>
+            <p id="avgAttention">0%</p>
+          </div>
+          <div class="card">
+            <h2>Dominant Emotion</h2>
+            <p id="mainEmotion">---</p>
+          </div>
+        </div>
+
+        <!-- FIX: Added student count setter so teacher can define class size -->
+        <div class="set-students-box">
+          <label>Set Student Count:</label>
+          <input type="number" id="studentCountInput" min="1" max="50" value="5" />
+          <button onclick="setStudentCount()">Apply</button>
+        </div>
+      </section>
+
+      <!-- CAMERA SECTION -->
+      <section id="cameraSection" class="hidden">
+        <div class="camera-wrapper">
+          <video id="video" autoplay muted playsinline></video>
+          <!-- FIX: canvas sized via JS to always match video -->
+          <canvas id="overlay"></canvas>
+        </div>
+      </section>
+
+      <!-- STUDENTS SECTION -->
+      <section id="studentsSection" class="hidden">
+        <div class="students-grid" id="studentsGrid"></div>
+      </section>
+
+      <!-- ANALYSIS SECTION -->
+      <section id="analysisSection" class="hidden">
+        <div class="analysis-box">
+          <h2>📊 Quick Analysis</h2>
+          <p id="analysisText">Waiting for AI analysis...</p>
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+</body>
+</html>
