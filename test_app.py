@@ -40,6 +40,16 @@ def test_create_account_and_login(driver):
     create_page = driver.find_element(By.ID, "createPage")
     assert create_page.is_displayed(), "Create account page should be visible"
     
+    # Click "Back" button to verify it returns to login page
+    back_btn = driver.find_element(By.XPATH, "//button[text()='Back']")
+    back_btn.click()
+    assert login_page.is_displayed(), "Should return to login page after clicking Back"
+    
+    # Go back to Create Account page again
+    create_btn = driver.find_element(By.XPATH, "//button[text()='Create Account']")
+    create_btn.click()
+    assert create_page.is_displayed(), "Create account page should be visible again"
+    
     # 3. Fill in details and create account
     driver.find_element(By.ID, "newUser").send_keys("teacher1")
     driver.find_element(By.ID, "newPass").send_keys("securepassword123")
