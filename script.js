@@ -77,11 +77,10 @@ async function startCamera() {
       canvas.width  = video.videoWidth;
       canvas.height = video.videoHeight;
     });
-
-    startDetection();
   } catch (err) {
-    alert("Camera Access Denied. Please allow camera permission.");
+    console.warn("Camera Access Denied. Running dashboard in simulation mode.");
   }
+  startDetection();
 }
 
 function stopCamera() {
