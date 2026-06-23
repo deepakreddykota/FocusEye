@@ -9,10 +9,12 @@ from selenium.webdriver.support import expected_conditions as EC
 @pytest.fixture(scope="module")
 def driver():
     chrome_options = Options()
-    # Configuration for headless CI environments
-    chrome_options.add_argument("--headless")
-    chrome_options.add_argument("--no-sandbox")
-    chrome_options.add_argument("--disable-dev-shm-usage")
+    # Run in headless mode only in CI environments
+    import os
+    if os.environ.get("GITHUB_ACTIONS") == "true":
+        chrome_options.add_argument("--headless")
+        chrome_options.add_argument("--no-sandbox")
+        chrome_options.add_argument("--disable-dev-shm-usage")
     # Bypass camera prompts and supply fake camera stream for automated testing
     chrome_options.add_argument("--use-fake-ui-for-media-stream")
     chrome_options.add_argument("--use-fake-device-for-media-stream")
