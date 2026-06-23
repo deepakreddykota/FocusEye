@@ -96,6 +96,10 @@ def test_sidebar_navigation(driver):
     assert not "hidden" in students_sec.get_attribute("class"), "Students section should not be hidden"
     
     # Verify student cards are generated and match the student count
+    # Note: We wait for the 3-second interval tick in the app to rebuild the students grid
+    WebDriverWait(driver, 5).until(
+        lambda d: len(d.find_elements(By.CLASS_NAME, "student-card")) == 12
+    )
     student_cards = driver.find_elements(By.CLASS_NAME, "student-card")
     assert len(student_cards) == 12, f"Should display 12 student cards, found {len(student_cards)}"
     
