@@ -166,34 +166,53 @@ header {
   color: #00ffcc;
 }
 
-/* FIX: Student count setter box */
-.set-students-box {
+/* AI Detection Status Box */
+.ai-status-box {
   margin: 0 20px 20px;
   padding: 20px;
   background: #12263a;
   border-radius: 15px;
   display: flex;
+  justify-content: space-between;
   align-items: center;
   gap: 15px;
   flex-wrap: wrap;
+  box-shadow: 0 0 10px rgba(0, 255, 204, 0.2);
 }
 
-.set-students-box label {
-  color: #00ffcc;
-  font-weight: bold;
-}
-
-.set-students-box input {
-  padding: 10px;
-  border-radius: 10px;
-  border: none;
-  width: 80px;
-  background: #1a2e40;
-  color: white;
+.ai-status-indicator {
+  display: flex;
+  align-items: center;
+  gap: 10px;
   font-size: 16px;
 }
 
-.set-students-box button {
+.pulse-dot {
+  width: 12px;
+  height: 12px;
+  background-color: #00ffcc;
+  border-radius: 50%;
+  display: inline-block;
+  box-shadow: 0 0 0 0 rgba(0, 255, 204, 0.7);
+  animation: pulse 1.6s infinite;
+}
+
+@keyframes pulse {
+  0% {
+    transform: scale(0.95);
+    box-shadow: 0 0 0 0 rgba(0, 255, 204, 0.7);
+  }
+  70% {
+    transform: scale(1);
+    box-shadow: 0 0 0 8px rgba(0, 255, 204, 0);
+  }
+  100% {
+    transform: scale(0.95);
+    box-shadow: 0 0 0 0 rgba(0, 255, 204, 0);
+  }
+}
+
+.rescan-btn {
   padding: 10px 20px;
   border: none;
   border-radius: 10px;
@@ -201,6 +220,12 @@ header {
   font-weight: bold;
   cursor: pointer;
   color: #08131d;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.rescan-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(0, 255, 204, 0.4);
 }
 
 /* CAMERA */

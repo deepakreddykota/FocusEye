@@ -107,14 +107,24 @@ function logout() {
 /* ─── SET STUDENT COUNT ──────────────────────────────── */
 // FIX: Teacher manually sets class size — count stays stable between ticks
 
-function setStudentCount() {
-  const input = parseInt(document.getElementById("studentCountInput").value);
-  if (isNaN(input) || input < 1 || input > 50) {
-    alert("Please enter a valid student count between 1 and 50.");
-    return;
-  }
-  fixedStudentCount = input;
-  document.getElementById("students").innerText = fixedStudentCount;
+/* ─── AI AUTOMATIC STUDENT DETECTION ─────────────────── */
+
+function rescanStudents() {
+  const statusEl = document.getElementById("detectionStatus");
+  statusEl.innerText = "Scanning classroom...";
+  statusEl.style.color = "#00ffcc";
+
+  // Simulate scanning duration
+  setTimeout(() => {
+    // Generate a random student count between 4 and 10 representing automatic detection
+    const detectedCount = Math.floor(Math.random() * 7) + 4; // 4 to 10
+    fixedStudentCount = detectedCount;
+    document.getElementById("students").innerText = fixedStudentCount;
+    statusEl.innerText = `Active (${fixedStudentCount} detected)`;
+    
+    // Trigger tick immediately to redraw face boxes and student cards
+    runDetectionTick();
+  }, 1000);
 }
 
 /* ─── MENU / SECTION NAVIGATION ─────────────────────── */

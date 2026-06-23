@@ -85,15 +85,20 @@ def test_dashboard_metrics_and_student_count(driver):
     # Verify initial student count defaults to 5
     assert students_el.text == "5", "Default student count should be 5"
     
-    # Change the student count
-    input_box = driver.find_element(By.ID, "studentCountInput")
-    input_box.clear()
-    input_box.send_keys("12")
-    driver.find_element(By.XPATH, "//button[text()='Apply']").click()
+    # Click "Re-scan Classroom" button to trigger auto-detection
+    rescan_btn = driver.find_element(By.XPATH, "//button[contains(text(), 'Re-scan')]")
+    rescan_btn.click()
     
-    # Verify student count is updated to 12
-    WebDriverWait(driver, 5).until(EC.text_to_be_present_in_element((By.ID, "students"), "12"))
-    assert students_el.text == "12", "Student count should update to 12"
+    # Verify status changes to scanning
+    status_el = driver.find_element(By.ID, "detectionStatus")
+    WebDriverWait(driver, 5).until(lambda d: "Scanning" in status_el.text)
+    
+    # Wait for scan to complete and status to show active count
+    WebDriverWait(driver, 5).until(lambda d: "Active (" in status_el.text)
+    
+    # Verify student count is updated and is a number between 4 and 10
+    detected_count = int(students_el.text)
+    assert 4 <= detected_count <= 10, f"Detected count should be between 4 and 10, found {detected_count}"
 
 def test_sidebar_navigation(driver):
     # 1. Navigate to Live Camera
@@ -102,18 +107,20 @@ def test_sidebar_navigation(driver):
     camera_sec = driver.find_element(By.ID, "cameraSection")
     assert not "hidden" in camera_sec.get_attribute("class"), "Camera section should not be hidden"
     
+    # Get current student count (using textContent as it might be hidden when on another tab)
+    expected_count = int(driver.find_element(By.ID, "students").get_attribute("textContent"))
+    
     # 2. Navigate to Students section
     driver.find_element(By.ID, "nav-students").click()
     students_sec = driver.find_element(By.ID, "studentsSection")
     assert not "hidden" in students_sec.get_attribute("class"), "Students section should not be hidden"
     
     # Verify student cards are generated and match the student count
-    # Note: We wait for the 3-second interval tick in the app to rebuild the students grid
     WebDriverWait(driver, 5).until(
-        lambda d: len(d.find_elements(By.CLASS_NAME, "student-card")) == 12
+        lambda d: len(d.find_elements(By.CLASS_NAME, "student-card")) == expected_count
     )
     student_cards = driver.find_elements(By.CLASS_NAME, "student-card")
-    assert len(student_cards) == 12, f"Should display 12 student cards, found {len(student_cards)}"
+    assert len(student_cards) == expected_count, f"Should display {expected_count} student cards, found {len(student_cards)}"
     
     # 3. Navigate to Quick Analysis
     driver.find_element(By.ID, "nav-analysis").click()

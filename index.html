@@ -76,11 +76,13 @@
           </div>
         </div>
 
-        <!-- FIX: Added student count setter so teacher can define class size -->
-        <div class="set-students-box">
-          <label>Set Student Count:</label>
-          <input type="number" id="studentCountInput" min="1" max="50" value="5" />
-          <button onclick="setStudentCount()">Apply</button>
+        <!-- AI Detection Status Box -->
+        <div class="ai-status-box">
+          <div class="ai-status-indicator">
+            <span class="pulse-dot"></span>
+            <strong>AI Auto-Detection:</strong> <span id="detectionStatus">Active (5 detected)</span>
+          </div>
+          <button class="rescan-btn" onclick="rescanStudents()">🔄 Re-scan Classroom</button>
         </div>
       </section>
 
