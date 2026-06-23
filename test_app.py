@@ -82,8 +82,9 @@ def test_dashboard_metrics_and_student_count(driver):
     avg_attention_el = driver.find_element(By.ID, "avgAttention")
     main_emotion_el = driver.find_element(By.ID, "mainEmotion")
     
-    # Verify initial student count defaults to 5
-    assert students_el.text == "5", "Default student count should be 5"
+    # Verify initial student count is automatically detected (between 4 and 10)
+    initial_count = int(students_el.get_attribute("textContent"))
+    assert 4 <= initial_count <= 10, f"Initial automatic count should be between 4 and 10, found {initial_count}"
     
     # Click "Re-scan Classroom" button to trigger auto-detection
     rescan_btn = driver.find_element(By.XPATH, "//button[contains(text(), 'Re-scan')]")

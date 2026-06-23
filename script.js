@@ -151,8 +151,14 @@ function startDetection() {
   // Clear any old interval before starting a new one
   stopDetection();
 
-  // FIX: Show student count immediately on start
+  // Automatically detect a random student count on start (between 4 and 10)
+  fixedStudentCount = Math.floor(Math.random() * 7) + 4;
   document.getElementById("students").innerText = fixedStudentCount;
+
+  const statusEl = document.getElementById("detectionStatus");
+  if (statusEl) {
+    statusEl.innerText = `Active (${fixedStudentCount} detected)`;
+  }
 
   detectionInterval = setInterval(() => {
     runDetectionTick();
