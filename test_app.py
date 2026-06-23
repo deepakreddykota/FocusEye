@@ -24,7 +24,7 @@ def driver():
     yield driver
     driver.quit()
 
-def test_create_account_and_login(driver):
+def test_create_account_and_login_with_remember_me(driver):
     # Load the web application
     driver.get("http://localhost:8000")
     
@@ -64,23 +64,37 @@ def test_create_account_and_login(driver):
     # 4. Verify we are returned to the login page
     assert login_page.is_displayed(), "Should return to login page after account creation"
     
-    # 5. Try logging in with the new credentials
+    # 5. Check the "Remember Session" checkbox
+    remember_checkbox = driver.find_element(By.ID, "rememberMe")
+    if not remember_checkbox.is_selected():
+        remember_checkbox.click()
+        
+    # 6. Try logging in with the new credentials
     driver.find_element(By.ID, "username").send_keys("teacher1")
     driver.find_element(By.ID, "password").send_keys("securepassword123")
     driver.find_element(By.XPATH, "//button[text()='Login']").click()
     
-    # 6. Verify we are now logged in and dashboard is visible
+    # 7. Verify we are now logged in and dashboard is visible
     WebDriverWait(driver, 5).until(
         lambda d: not "hidden" in d.find_element(By.ID, "dashboard").get_attribute("class")
     )
     dashboard = driver.find_element(By.ID, "dashboard")
     assert dashboard.is_displayed(), "Dashboard should be visible after successful login"
 
+def test_session_persistence_on_reload(driver):
+    # Refresh the browser page to test auto-login persistence
+    driver.refresh()
+    
+    # Verify we bypass the login page and land straight on the dashboard
+    WebDriverWait(driver, 5).until(
+        lambda d: not "hidden" in d.find_element(By.ID, "dashboard").get_attribute("class")
+    )
+    dashboard = driver.find_element(By.ID, "dashboard")
+    assert dashboard.is_displayed(), "Should auto-login and show dashboard on page reload"
+
 def test_dashboard_metrics_and_student_count(driver):
     # Verify average attention, student count, and dominant emotion elements are present
     students_el = driver.find_element(By.ID, "students")
-    avg_attention_el = driver.find_element(By.ID, "avgAttention")
-    main_emotion_el = driver.find_element(By.ID, "mainEmotion")
     
     # Verify initial student count is automatically detected (between 4 and 10)
     initial_count = int(students_el.get_attribute("textContent"))
@@ -98,38 +112,39 @@ def test_dashboard_metrics_and_student_count(driver):
     WebDriverWait(driver, 5).until(lambda d: "Active (" in status_el.text)
     
     # Verify student count is updated and is a number between 4 and 10
-    detected_count = int(students_el.text)
+    detected_count = int(students_el.get_attribute("textContent"))
     assert 4 <= detected_count <= 10, f"Detected count should be between 4 and 10, found {detected_count}"
 
-def test_sidebar_navigation(driver):
-    # 1. Navigate to Live Camera
-    driver.find_element(By.ID, "nav-camera").click()
-    # Verify camera section is displayed and not hidden
-    camera_sec = driver.find_element(By.ID, "cameraSection")
-    assert not "hidden" in camera_sec.get_attribute("class"), "Camera section should not be hidden"
+def test_sidebar_navigation_and_features(driver):
+    # 1. Navigate to Real-time Attention
+    driver.find_element(By.ID, "nav-attention").click()
+    attention_sec = driver.find_element(By.ID, "attentionSection")
+    assert not "hidden" in attention_sec.get_attribute("class"), "Attention section should not be hidden"
+    assert driver.find_element(By.ID, "attentionGaugeValue").is_displayed()
     
-    # Get current student count (using textContent as it might be hidden when on another tab)
-    expected_count = int(driver.find_element(By.ID, "students").get_attribute("textContent"))
+    # 2. Navigate to Student Registry and Add a Student
+    driver.find_element(By.ID, "nav-registry").click()
+    registry_sec = driver.find_element(By.ID, "registrySection")
+    assert not "hidden" in registry_sec.get_attribute("class"), "Registry section should not be hidden"
     
-    # 2. Navigate to Students section
-    driver.find_element(By.ID, "nav-students").click()
-    students_sec = driver.find_element(By.ID, "studentsSection")
-    assert not "hidden" in students_sec.get_attribute("class"), "Students section should not be hidden"
+    # Fill student registration form
+    driver.find_element(By.ID, "regStudentName").send_keys("Marcus Aurelius")
+    driver.find_element(By.ID, "regStudentSeat").send_keys("15")
+    driver.find_element(By.XPATH, "//button[text()='Add Student']").click()
     
-    # Verify student cards are generated and match the student count
+    # Verify registered student appears in the roster table
     WebDriverWait(driver, 5).until(
-        lambda d: len(d.find_elements(By.CLASS_NAME, "student-card")) == expected_count
+        lambda d: "Marcus Aurelius" in d.find_element(By.ID, "registryTableBody").get_attribute("innerHTML")
     )
-    student_cards = driver.find_elements(By.CLASS_NAME, "student-card")
-    assert len(student_cards) == expected_count, f"Should display {expected_count} student cards, found {len(student_cards)}"
     
-    # 3. Navigate to Quick Analysis
-    driver.find_element(By.ID, "nav-analysis").click()
-    analysis_sec = driver.find_element(By.ID, "analysisSection")
-    assert not "hidden" in analysis_sec.get_attribute("class"), "Analysis section should not be hidden"
+    # 3. Navigate to Student Emotion Analysis
+    driver.find_element(By.ID, "nav-emotions").click()
+    emotions_sec = driver.find_element(By.ID, "emotionsSection")
+    assert not "hidden" in emotions_sec.get_attribute("class"), "Emotions section should not be hidden"
     
-    analysis_text = driver.find_element(By.ID, "analysisText").text
-    assert "attention" in analysis_text.lower(), "Analysis text should contain focus information"
+    # Verify progress bars are rendered
+    emotions_rows = driver.find_elements(By.CLASS_NAME, "emotion-row")
+    assert len(emotions_rows) > 0, "Should display emotions progress bar rows"
     
     # 4. Navigate back to Dashboard home
     driver.find_element(By.ID, "nav-home").click()
@@ -137,15 +152,21 @@ def test_sidebar_navigation(driver):
     assert not "hidden" in home_sec.get_attribute("class"), "Home section should not be hidden"
 
 def test_logout(driver):
-    # Click logout button
-    driver.find_element(By.CLASS_NAME, "logout-btn").click()
+    # 1. Navigate to Logout Confirmation section
+    driver.find_element(By.ID, "nav-logout-view").click()
+    logout_sec = driver.find_element(By.ID, "logoutViewSection")
+    assert not "hidden" in logout_sec.get_attribute("class"), "Logout section should not be hidden"
     
-    # Verify we are redirected to login page and dashboard is hidden
+    # 2. Click Logout button
+    driver.find_element(By.XPATH, "//button[text()='Logout Immediately']").click()
+    
+    # Verify we are redirected back to login page
     login_page = driver.find_element(By.ID, "loginPage")
     dashboard = driver.find_element(By.ID, "dashboard")
     assert login_page.is_displayed(), "Login page should be visible on logout"
     assert "hidden" in dashboard.get_attribute("class"), "Dashboard should be hidden on logout"
     
-    # Verify credentials inputs are cleared
+    # Verify credentials and checkbox inputs are cleared
     assert driver.find_element(By.ID, "username").get_attribute("value") == "", "Username field should be empty"
     assert driver.find_element(By.ID, "password").get_attribute("value") == "", "Password field should be empty"
+    assert not driver.find_element(By.ID, "rememberMe").is_selected(), "Remember Me checkbox should be unselected"

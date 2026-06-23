@@ -17,10 +17,15 @@
   <div id="loginPage" class="login-container">
     <div class="login-box">
       <h1>🎯 FocusEye AI</h1>
+      <p style="margin-bottom: 20px; color: #8892b0;">AI-Driven Classroom Analytics</p>
       <input type="text" id="username" placeholder="Username">
       <input type="password" id="password" placeholder="Password">
+      <div class="remember-me">
+        <input type="checkbox" id="rememberMe">
+        <label for="rememberMe">Remember Session</label>
+      </div>
       <button onclick="login()">Login</button>
-      <button onclick="showCreate()">Create Account</button>
+      <button onclick="showCreate()" style="background: rgba(255,255,255,0.1); color: white; margin-top: 8px;">Create Account</button>
     </div>
   </div>
 
@@ -31,39 +36,73 @@
       <input type="text" id="newUser" placeholder="New Username">
       <input type="password" id="newPass" placeholder="New Password">
       <button onclick="createAccount()">Create</button>
-      <button onclick="backLogin()">Back</button>
+      <button onclick="backLogin()" style="background: rgba(255,255,255,0.1); color: white; margin-top: 8px;">Back</button>
     </div>
   </div>
 
-  <!-- DASHBOARD -->
+  <!-- DASHBOARD CONTAINER -->
   <div id="dashboard" class="hidden">
 
     <!-- SIDEBAR -->
     <aside class="sidebar">
       <h2>🎯 FocusEye</h2>
-      <!-- FIX: Added id to each li for active highlighting -->
+      
+      <div class="sidebar-category">Core Views</div>
       <ul>
-        <li id="nav-home"     class="nav-item active" onclick="showSection('homeSection', this)">🏠 Dashboard</li>
-        <li id="nav-camera"   class="nav-item"        onclick="showSection('cameraSection', this)">📷 Live Camera</li>
-        <li id="nav-students" class="nav-item"        onclick="showSection('studentsSection', this)">👨‍🎓 Students</li>
-        <li id="nav-analysis" class="nav-item"        onclick="showSection('analysisSection', this)">📊 Quick Analysis</li>
+        <li id="nav-home" class="nav-item active" onclick="showSection('homeSection', this)">🏠 Dashboard</li>
+        <li id="nav-attention" class="nav-item" onclick="showSection('attentionSection', this)">👁️ Real-time Attention</li>
+        <li id="nav-camera" class="nav-item" onclick="showSection('cameraSection', this)">📷 Live Camera</li>
+        <li id="nav-camera-control" class="nav-item" onclick="showSection('cameraControlSection', this)">🔌 Camera Settings</li>
+      </ul>
+
+      <div class="sidebar-category">Classroom Setup</div>
+      <ul>
+        <li id="nav-occupancy" class="nav-item" onclick="showSection('occupancySection', this)">🔢 Occupancy Map</li>
+        <li id="nav-registry" class="nav-item" onclick="showSection('registrySection', this)">🎒 Student Registry</li>
+        <li id="nav-students" class="nav-item" onclick="showSection('studentsSection', this)">🖥️ Students Monitoring</li>
+      </ul>
+
+      <div class="sidebar-category">AI & Analytics</div>
+      <ul>
+        <li id="nav-emotions" class="nav-item" onclick="showSection('emotionsSection', this)">🎭 Emotion Analysis</li>
+        <li id="nav-gaze" class="nav-item" onclick="showSection('gazeSection', this)">👀 Eye Gaze Tracking</li>
+        <li id="nav-ai-insights" class="nav-item" onclick="showSection('aiInsightsSection', this)">📈 AI Insights</li>
+        <li id="nav-alerts" class="nav-item" onclick="showSection('alertsSection', this)">🚨 Focus Alerts</li>
+        <li id="nav-analysis" class="nav-item" onclick="showSection('analysisSection', this)">📊 Quick Analysis</li>
+      </ul>
+
+      <div class="sidebar-category">Lecture Tools</div>
+      <ul>
+        <li id="nav-notes" class="nav-item" onclick="showSection('notesSection', this)">📝 Teacher Log & Notes</li>
+        <li id="nav-scheduler" class="nav-item" onclick="showSection('schedulerSection', this)">⏰ Lesson Scheduler</li>
+        <li id="nav-leaderboard" class="nav-item" onclick="showSection('leaderboardSection', this)">🏆 Attention Leaderboard</li>
+        <li id="nav-history" class="nav-item" onclick="showSection('historySection', this)">📊 History Reports</li>
+      </ul>
+
+      <div class="sidebar-category">System</div>
+      <ul>
+        <li id="nav-settings" class="nav-item" onclick="showSection('settingsSection', this)">⚙️ General Settings</li>
+        <li id="nav-help" class="nav-item" onclick="showSection('helpSection', this)">❓ Help & FAQ</li>
+        <li id="nav-logout-view" class="nav-item" onclick="showSection('logoutViewSection', this)">🚪 Logout</li>
       </ul>
     </aside>
 
-    <!-- MAIN -->
+    <!-- MAIN CONTENT -->
     <main class="main-content">
 
       <header>
         <div class="logo">👁 AI Smart Classroom</div>
-        <button class="logout-btn" onclick="logout()">Logout</button>
+        <div class="header-profile">
+          <span id="headerTeacherName">Welcome, Teacher</span>
+          <button class="logout-btn" onclick="logout()">Logout</button>
+        </div>
       </header>
 
-      <!-- HOME SECTION -->
+      <!-- 1. DASHBOARD PAGE -->
       <section id="homeSection">
         <div class="analytics">
           <div class="card">
             <h2>Total Students</h2>
-            <!-- FIX: Shows fixed student count set by teacher, not random -->
             <p id="students">5</p>
           </div>
           <div class="card">
@@ -76,7 +115,6 @@
           </div>
         </div>
 
-        <!-- AI Detection Status Box -->
         <div class="ai-status-box">
           <div class="ai-status-indicator">
             <span class="pulse-dot"></span>
@@ -86,25 +124,289 @@
         </div>
       </section>
 
-      <!-- CAMERA SECTION -->
-      <section id="cameraSection" class="hidden">
-        <div class="camera-wrapper">
-          <video id="video" autoplay muted playsinline></video>
-          <!-- FIX: canvas sized via JS to always match video -->
-          <canvas id="overlay"></canvas>
+      <!-- 2. REAL-TIME ATTENTION PAGE -->
+      <section id="attentionSection" class="hidden">
+        <div class="view-card">
+          <h2>👁️ Real-time Attention Monitor</h2>
+          <p class="description">Live classroom engagement level metrics.</p>
+          <div class="gauge-container">
+            <div class="gauge-fill" id="attentionGaugeFill" style="transform: rotate(45deg);"></div>
+            <div class="gauge-cover">
+              <span id="attentionGaugeValue">0%</span>
+            </div>
+          </div>
+          <div class="timeline-container">
+            <h3>Recent Focus Log</h3>
+            <ul id="attentionTimeline" class="log-list">
+              <li>[Info] System initialized. Tracking active.</li>
+            </ul>
+          </div>
         </div>
       </section>
 
-      <!-- STUDENTS SECTION -->
-      <section id="studentsSection" class="hidden">
-        <div class="students-grid" id="studentsGrid"></div>
+      <!-- 3. LIVE CAMERA PAGE -->
+      <section id="cameraSection" class="hidden">
+        <div class="view-card">
+          <h2>📷 Live Classroom Camera Feed</h2>
+          <div class="camera-wrapper">
+            <video id="video" autoplay muted playsinline></video>
+            <canvas id="overlay"></canvas>
+          </div>
+        </div>
       </section>
 
-      <!-- ANALYSIS SECTION -->
+      <!-- 4. CAMERA SETTINGS PAGE -->
+      <section id="cameraControlSection" class="hidden">
+        <div class="view-card">
+          <h2>🔌 Camera Control Console</h2>
+          <p class="description">Turn off your camera to switch to offline simulation mode or switch inputs.</p>
+          <div class="form-group">
+            <label>Camera Power Mode:</label>
+            <button id="cameraToggleBtn" class="form-btn toggle-active" onclick="toggleCameraPower()">🟢 CAMERA ON</button>
+          </div>
+          <div class="form-group">
+            <label>Webcam Source Input:</label>
+            <select class="form-select">
+              <option>Default System Camera (Integrated)</option>
+              <option>External USB Webcam (Simulated)</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Resolution Preference:</label>
+            <select class="form-select">
+              <option>720p HD (Balanced)</option>
+              <option>1080p Full HD (High Resource)</option>
+            </select>
+          </div>
+        </div>
+      </section>
+
+      <!-- 5. SEAT OCCUPANCY MAP PAGE -->
+      <section id="occupancySection" class="hidden">
+        <div class="view-card">
+          <h2>🔢 Seat Occupancy & Layout Map</h2>
+          <p class="description">A virtual grid mapping of filled vs empty desk positions.</p>
+          <div class="seat-map" id="seatMapGrid"></div>
+        </div>
+      </section>
+
+      <!-- 6. STUDENT REGISTRY PAGE -->
+      <section id="registrySection" class="hidden">
+        <div class="view-card">
+          <h2>🎒 Student Profile Registry</h2>
+          <p class="description">Register student profiles to link names with detected seats.</p>
+          <div class="registry-layout">
+            <div class="registry-form">
+              <h3>Register New Student</h3>
+              <input type="text" id="regStudentName" placeholder="Student Name">
+              <input type="number" id="regStudentSeat" placeholder="Desk Seat Number" min="1">
+              <button onclick="registerStudent()" class="form-btn">Add Student</button>
+            </div>
+            <div class="registry-table-container">
+              <h3>Active Student Roster</h3>
+              <table id="registryTable">
+                <thead>
+                  <tr>
+                    <th>Seat</th>
+                    <th>Name</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody id="registryTableBody">
+                  <!-- Generated via JS -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 7. STUDENTS MONITORING GRID PAGE -->
+      <section id="studentsSection" class="hidden">
+        <div class="view-card">
+          <h2>🖥️ Student Real-time Monitoring</h2>
+          <div class="students-grid" id="studentsGrid"></div>
+        </div>
+      </section>
+
+      <!-- 8. EMOTIONS ANALYSIS PAGE -->
+      <section id="emotionsSection" class="hidden">
+        <div class="view-card">
+          <h2>🎭 Emotions Analysis distribution</h2>
+          <p class="description">Simulated emotional classification metrics for detected students.</p>
+          <div class="emotions-bars" id="emotionsDistribution">
+            <!-- Generated via JS -->
+          </div>
+        </div>
+      </section>
+
+      <!-- 9. EYE GAZE TRACKING PAGE -->
+      <section id="gazeSection" class="hidden">
+        <div class="view-card">
+          <h2>👀 Eye Gaze Tracking & Focus Map</h2>
+          <p class="description">Simulated coordinates mapping focus points on the blackboard/screen.</p>
+          <div class="gaze-box">
+            <canvas id="gazeTrackerCanvas" width="400" height="250"></canvas>
+            <div class="gaze-stats">
+              <p>Blackboard Focus: <span id="blackboardFocusText">0%</span></p>
+              <p>Device Focus: <span id="deviceFocusText">0%</span></p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 10. AI INSIGHTS PAGE -->
+      <section id="aiInsightsSection" class="hidden">
+        <div class="view-card">
+          <h2>📈 AI Pedagogical Insights & Tips</h2>
+          <p class="description">Automatic teaching suggestions generated based on focus trends.</p>
+          <div class="insight-cards-list" id="aiInsightsList">
+            <!-- Generated via JS -->
+          </div>
+        </div>
+      </section>
+
+      <!-- 11. FOCUS ALERTS PAGE -->
+      <section id="alertsSection" class="hidden">
+        <div class="view-card">
+          <h2>🚨 Focus Alerts & Threshold Configuration</h2>
+          <p class="description">Receive notifications on screen when classroom attention drops below threshold.</p>
+          <div class="form-group">
+            <label>Attention Alarm Threshold: <span id="thresholdVal">65%</span></label>
+            <input type="range" id="thresholdSlider" min="30" max="90" value="65" oninput="updateThreshold(this.value)">
+          </div>
+          <div class="form-group">
+            <label>Sound Notification Alerts:</label>
+            <input type="checkbox" id="soundAlertCheckbox" checked> Enable Voice Alerts
+          </div>
+          <div class="form-group">
+            <label>Trigger Simulated Alert Notification:</label>
+            <button onclick="triggerSimulatedAlert()" class="form-btn" style="background: #ff4444; color: white;">🚨 Test Alert Trigger</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- 12. QUICK ANALYSIS PAGE -->
       <section id="analysisSection" class="hidden">
-        <div class="analysis-box">
-          <h2>📊 Quick Analysis</h2>
+        <div class="view-card">
+          <h2>📊 Quick Analysis Summary</h2>
           <p id="analysisText">Waiting for AI analysis...</p>
+        </div>
+      </section>
+
+      <!-- 13. TEACHER LOG & NOTES PAGE -->
+      <section id="notesSection" class="hidden">
+        <div class="view-card">
+          <h2>📝 Teacher Observation Log & Notes</h2>
+          <p class="description">Write down observations during classroom sessions.</p>
+          <div class="notes-layout">
+            <div class="notes-form">
+              <textarea id="teacherNoteInput" placeholder="Write observation notes here... (e.g. Student 2 was distracted during math module)"></textarea>
+              <button onclick="addTeacherNote()" class="form-btn">Save Note</button>
+            </div>
+            <div class="notes-history">
+              <h3>Observation Logs</h3>
+              <ul id="teacherNotesList">
+                <!-- Notes will display here -->
+              </ul>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 14. LESSON SCHEDULER PAGE -->
+      <section id="schedulerSection" class="hidden">
+        <div class="view-card">
+          <h2>⏰ Lesson Scheduler & Session Timer</h2>
+          <p class="description">Configure the lecture timer to monitor attention during specific lesson blocks.</p>
+          <div class="scheduler-container">
+            <div class="timer-display" id="schedulerTimerDisplay">00:00</div>
+            <div class="scheduler-controls">
+              <input type="number" id="schedulerMinutesInput" placeholder="Minutes" min="1" max="90" value="10">
+              <button id="schedulerStartBtn" onclick="toggleSchedulerTimer()" class="form-btn">▶️ Start Session</button>
+            </div>
+            <div id="schedulerLog" class="scheduler-log">
+              <!-- Logs during session -->
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 15. ATTENTION LEADERBOARD PAGE -->
+      <section id="leaderboardSection" class="hidden">
+        <div class="view-card">
+          <h2>🏆 Focus & Attention Leaderboard</h2>
+          <p class="description">Showcasing current top focus ranking positions to gamify lecture participation.</p>
+          <div class="leaderboard-list" id="leaderboardList">
+            <!-- Generated via JS -->
+          </div>
+        </div>
+      </section>
+
+      <!-- 16. HISTORY REPORTS PAGE -->
+      <section id="historySection" class="hidden">
+        <div class="view-card">
+          <h2>📊 Classroom Historical Reports</h2>
+          <p class="description">Compare engagement profiles between lectures, semesters, or courses.</p>
+          <div class="history-metrics">
+            <div class="history-stat">
+              <h3>Science Lecture</h3>
+              <p class="history-percent">82%</p>
+            </div>
+            <div class="history-stat">
+              <h3>Math Lecture</h3>
+              <p class="history-percent">68%</p>
+            </div>
+            <div class="history-stat">
+              <h3>History Lecture</h3>
+              <p class="history-percent">74%</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 17. GENERAL SETTINGS PAGE -->
+      <section id="settingsSection" class="hidden">
+        <div class="view-card">
+          <h2>⚙️ General System Settings</h2>
+          <div class="form-group">
+            <label>School Facility / Institution:</label>
+            <input type="text" class="form-select" id="settingsSchoolName" value="AI Smart Classroom Facility">
+          </div>
+          <div class="form-group">
+            <label>Active Theme:</label>
+            <select class="form-select">
+              <option>Deep Space Dark (Active)</option>
+              <option>High Contrast Dark</option>
+            </select>
+          </div>
+          <button class="form-btn" onclick="saveGeneralSettings()">Save Settings</button>
+        </div>
+      </section>
+
+      <!-- 18. HELP & FAQ PAGE -->
+      <section id="helpSection" class="hidden">
+        <div class="view-card">
+          <h2>❓ Help Center & FAQ</h2>
+          <div class="faq-list">
+            <div class="faq-item">
+              <h3>How does FocusEye calculate attention?</h3>
+              <p>It processes focus, tracking eye gaze direction, head orientation, and facial emotion metrics to build an attention percentage.</p>
+            </div>
+            <div class="faq-item">
+              <h3>Why is the camera in "Simulation Mode"?</h3>
+              <p>If camera access is blocked or missing on the host computer, it defaults to simulation mode to continue rendering analytical cards.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 19. LOGOUT PAGE -->
+      <section id="logoutViewSection" class="hidden">
+        <div class="view-card" style="text-align: center; padding: 50px 20px;">
+          <h2>🚪 Logout Confirmation</h2>
+          <p class="description" style="margin-bottom: 30px;">Are you sure you want to end your active smart session?</p>
+          <button class="form-btn" onclick="logout()" style="background: red; color: white; padding: 15px 30px; font-size: 16px;">Logout Immediately</button>
         </div>
       </section>
 
